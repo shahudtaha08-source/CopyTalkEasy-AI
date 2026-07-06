@@ -14,13 +14,13 @@ export default function Landing() {
 
         <div className="mt-8 flex justify-center gap-4">
           <a
-            href="/dashboard"
+            href="/api/login"
             className="bg-white text-blue-600 px-6 py-3 rounded-xl font-semibold shadow"
           >
             Go to Dashboard
           </a>
 
-          <a href="/login" className="border border-white px-6 py-3 rounded-xl">
+          <a href="/api/login" className="border border-white px-6 py-3 rounded-xl">
             Login
           </a>
         </div>

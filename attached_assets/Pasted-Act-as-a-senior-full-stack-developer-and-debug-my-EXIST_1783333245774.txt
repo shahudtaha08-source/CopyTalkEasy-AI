@@ -1,0 +1,166 @@
+Act as a senior full-stack developer and debug my EXISTING AI web application.
+
+IMPORTANT:
+Do NOT rebuild the project from scratch.
+Do NOT redesign the UI.
+Do NOT change the existing CSS, colors, layout, or frontend design unless absolutely required to fix a functional bug.
+
+My frontend/home page is visible, but the application functionality is broken.
+
+CURRENT ISSUES:
+
+1. The login system is inconsistent.
+2. Sometimes login works once or twice, but after that it shows "Login Failed".
+3. After successful login, the dashboard does not open correctly.
+4. I sometimes receive this error:
+"404 Page Not Found. Did you forget to add the page to the router?"
+5. Some pages exist in the project but cannot be accessed through their routes.
+6. Authentication and redirect behavior appears to be broken.
+7. The frontend is visible, but the actual app flow is not working properly.
+
+YOUR TASK:
+
+First, inspect the COMPLETE existing project structure before changing any code.
+
+Check:
+
+- package.json
+- frontend entry files
+- App.jsx / App.tsx
+- main.jsx / main.tsx
+- router configuration
+- all pages
+- all components
+- login page
+- dashboard page
+- authentication logic
+- backend/server files
+- API routes
+- environment variables
+- database connection if present
+- session, token, JWT, or localStorage authentication logic
+
+ROUTING FIX:
+
+Find which routing library and version the project currently uses.
+
+Inspect all existing pages and create or repair the correct routes for them.
+
+Specifically verify:
+
+- /
+- /login
+- /dashboard
+
+Also verify every other page that already exists in the project.
+
+Do not create duplicate pages if the pages already exist.
+
+Make sure route paths, imports, filenames, and component exports match correctly.
+
+Fix the 404 router error.
+
+If React Router is used, configure BrowserRouter, Routes, Route, and navigation correctly according to the installed React Router version.
+
+AUTHENTICATION FIX:
+
+Trace the complete login flow from the login form to the dashboard.
+
+Find the REAL reason why login works sometimes and then fails.
+
+Check for:
+
+- incorrect API endpoint
+- wrong request method
+- incorrect email/password validation
+- stale authentication state
+- localStorage issues
+- token expiration issues
+- session issues
+- duplicate login handlers
+- frontend/backend mismatch
+- incorrect environment variables
+- backend server errors
+- incorrect redirect logic
+
+Fix the root cause.
+
+Do not simply hide the "Login Failed" error.
+
+If login is successful:
+
+1. Store authentication state correctly.
+2. Redirect the user to /dashboard.
+3. Keep the user logged in after page refresh if the current project architecture supports persistent authentication.
+4. Prevent unnecessary repeated login failures.
+
+If login fails:
+
+Show a clear and accurate error message based on the actual failure.
+
+DASHBOARD FIX:
+
+Make sure /dashboard loads the existing dashboard page.
+
+Do not create a fake blank dashboard if a dashboard component already exists.
+
+Connect the existing dashboard correctly.
+
+If the dashboard is protected, implement or repair the protected route logic.
+
+Unauthenticated users should be redirected to /login.
+
+Authenticated users should be able to access /dashboard without getting a 404.
+
+BACKEND AND API FIX:
+
+If this project has a backend, verify that the frontend is calling the correct API URL and port.
+
+Check all authentication API routes.
+
+Test the login API.
+
+Check server logs and browser console errors.
+
+Fix CORS, JSON parsing, API paths, or server configuration only if they are causing the problem.
+
+REPLIT DEPLOYMENT AND ROUTING:
+
+Make sure the application works correctly inside Replit.
+
+If this is a single-page React application, configure SPA fallback routing correctly so refreshing /dashboard or opening /dashboard directly does not return a 404.
+
+Verify the Replit run command and project configuration.
+
+FINAL VERIFICATION:
+
+After fixing the project, actually test this complete flow:
+
+Home page
+→ Login page
+→ Enter valid credentials
+→ Successful login
+→ Dashboard opens
+→ Refresh dashboard
+→ Dashboard still works
+→ Navigate between existing pages
+→ Logout
+→ Dashboard becomes protected
+→ Login again
+→ Dashboard opens successfully
+
+Also test login multiple times to confirm the "Login Failed after one or two logins" issue is permanently fixed.
+
+Do not stop after editing code.
+
+Run the application, inspect console/server errors, test the routes and authentication flow, and continue debugging until the complete flow works.
+
+At the end, give me a short summary of:
+1. What caused the problem
+2. Which files you changed
+3. What routing issue was fixed
+4. What authentication issue was fixed
+5. The valid test login credentials, only if demo credentials already exist in the project
+
+Preserve my existing UI and CSS.
+Focus on making the existing application fully functional.
