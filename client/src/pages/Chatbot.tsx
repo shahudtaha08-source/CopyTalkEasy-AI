@@ -7,6 +7,9 @@ import {
 } from "@/hooks/use-chat";
 import { Send, Plus, Loader2, Bot, User as UserIcon } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { isDemoMode, addDemoMessage } from "@/lib/demo-data";
+import { queryClient } from "@/lib/queryClient";
+import { api } from "@shared/routes";
 
 export default function Chatbot() {
   const { data: conversations, isLoading: loadingConvos } = useConversations();
@@ -61,9 +64,24 @@ export default function Chatbot() {
     setInput("");
     setIsStreaming(true);
 
-    // Placeholder for assistant response
     const assistantMessageIdx = messages.length + 1;
     setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
+
+    // Demo mode: return a scripted fallback
+    if (isDemoMode()) {
+      if (activeId) addDemoMessage(activeId, "user", userMessage.content);
+      await new Promise(r => setTimeout(r, 1200));
+      const demoResponse = "Thank you for sharing that with me. It takes courage to put your feelings into words. Remember, everything you share here stays private. I am here to help you reflect — not to diagnose or replace a professional. If you are feeling overwhelmed, please consider speaking with a counselor. Would you like a simple breathing exercise or would you prefer to keep talking?";
+      if (activeId) addDemoMessage(activeId, "assistant", demoResponse, "neutral", "Try the 4-7-8 breathing technique.");
+      setMessages((prev) => {
+        const newMsgs = [...prev];
+        newMsgs[assistantMessageIdx] = { role: "assistant", content: demoResponse };
+        return newMsgs;
+      });
+      setIsStreaming(false);
+      queryClient.invalidateQueries({ queryKey: [api.chat.history.path, activeId] });
+      return;
+    }
 
     try {
       const response = await fetch(`/api/conversations/${activeId}/messages`, {
@@ -154,25 +172,40 @@ export default function Chatbot() {
       {/* Main Chat Area */}
       <div className="flex-1 glass-card rounded-3xl flex flex-col overflow-hidden relative shadow-xl">
         {/* Chat Header */}
-        <div className="p-6 border-b border-border/50 bg-white/50 dark:bg-slate-900/50 backdrop-blur-md">
-          <h2 className="text-xl font-bold flex items-center gap-2">
-            <Bot className="w-6 h-6 text-teal-600" />
-            Therapist AI
+        <div className="p-5 border-b border-border/50 bg-white/50 dark:bg-slate-900/50 backdrop-blur-md">
+          <h2 className="text-lg font-bold flex items-center gap-2">
+            <Bot className="w-5 h-5 text-teal-600" />
+            Support Chat
           </h2>
-          <p className="text-sm text-muted-foreground">
-            Safe, private, and judgment-free space.
+          <p className="text-xs text-muted-foreground mt-0.5">
+            A reflective space to talk — not a therapist. If you are in crisis, please call <strong>14416</strong> (Tele MANAS).
           </p>
         </div>
 
         {/* Chat Messages */}
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
           {messages.length === 0 && !loadingHistory && (
-            <div className="h-full flex flex-col items-center justify-center text-center opacity-50">
-              <MessageCircle className="w-16 h-16 mb-4 text-teal-600" />
-              <p className="text-lg font-medium">Start a conversation...</p>
-              <p className="text-sm">
-                Say hello or share how you're feeling today.
-              </p>
+            <div className="h-full flex flex-col items-center justify-center text-center py-12 gap-4">
+              <div className="w-16 h-16 rounded-2xl bg-teal-100 dark:bg-teal-900/30 flex items-center justify-center">
+                <MessageCircle className="w-8 h-8 text-teal-600" />
+              </div>
+              <div>
+                <p className="text-lg font-bold text-slate-800 dark:text-slate-200">How are you feeling today?</p>
+                <p className="text-sm text-muted-foreground mt-1 max-w-xs">
+                  Share what's on your mind. This is a safe, private, and non-judgmental space to reflect and organize your thoughts.
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2 justify-center mt-2">
+                {["I'm feeling anxious", "I need to talk", "I've been struggling with sleep", "Tell me a calming tip"].map(s => (
+                  <button
+                    key={s}
+                    onClick={() => setInput(s)}
+                    className="text-xs bg-teal-50 dark:bg-teal-900/20 text-teal-700 dark:text-teal-300 border border-teal-200 dark:border-teal-800 px-3 py-1.5 rounded-full hover:bg-teal-100 transition"
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
             </div>
           )}
 

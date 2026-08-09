@@ -1,67 +1,196 @@
 import { useState, useEffect } from "react";
 import { useUser, useUpdateUser } from "@/hooks/use-user";
-import { Loader2, Globe, Clock, Check } from "lucide-react";
+import {
+  Loader2, Globe, Clock, Check, User, Phone, MapPin, Briefcase,
+  DollarSign, ShieldAlert, Palette, Save
+} from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+
+const LANGUAGES = ["English", "Hindi", "Urdu", "Marathi", "Tamil", "Telugu", "Kannada", "Bengali", "Gujarati"];
+const AGE_GROUPS = ["Teen (13-19)", "Young Adult (20-35)", "Middle Age (36-55)", "Senior (55+)"];
+const OCCUPATIONS = ["Student", "Working Professional", "Self-Employed", "Homemaker", "Retired", "Unemployed", "Other"];
+const BUDGETS = ["Low (Free resources only)", "Medium (Under ₹500/session)", "High (₹500+ per session)"];
+
+interface FormState {
+  firstName: string;
+  lastName: string;
+  ageGroup: string;
+  preferredLanguage: string;
+  emergencyContact: string;
+  city: string;
+  locality: string;
+  budget: string;
+  occupationType: string;
+}
+
+function Field({ label, icon: Icon, children }: { label: string; icon: typeof User; children: React.ReactNode }) {
+  return (
+    <div className="space-y-1.5">
+      <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
+        <Icon className="w-4 h-4 text-teal-600" /> {label}
+      </label>
+      {children}
+    </div>
+  );
+}
+
+const inputCls = "w-full px-4 py-3 rounded-xl border-2 border-border bg-card focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10 outline-none transition-all text-slate-900 dark:text-slate-100";
+const selectCls = `${inputCls} cursor-pointer`;
 
 export default function Settings() {
   const { data: user, isLoading } = useUser();
-  const { mutate: updateUser, isPending, isSuccess } = useUpdateUser();
-  const [ageGroup, setAgeGroup] = useState("");
-  const [preferredLanguage, setPreferredLanguage] = useState("");
+  const { mutate: updateUser, isPending } = useUpdateUser();
+  const { toast } = useToast();
+
+  const [form, setForm] = useState<FormState>({
+    firstName: "",
+    lastName: "",
+    ageGroup: "Young Adult (20-35)",
+    preferredLanguage: "English",
+    emergencyContact: "",
+    city: "",
+    locality: "",
+    budget: BUDGETS[0],
+    occupationType: "Student",
+  });
 
   useEffect(() => {
     if (user) {
-      setAgeGroup(user.ageGroup || "");
-      setPreferredLanguage(user.preferredLanguage || "");
+      setForm({
+        firstName: user.firstName || "",
+        lastName: user.lastName || "",
+        ageGroup: user.ageGroup || "Young Adult (20-35)",
+        preferredLanguage: user.preferredLanguage || "English",
+        emergencyContact: user.emergencyContact || "",
+        city: user.city || "",
+        locality: user.locality || "",
+        budget: user.budget || BUDGETS[0],
+        occupationType: user.occupationType || "Student",
+      });
     }
   }, [user]);
 
+  const set = (key: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
+    setForm(f => ({ ...f, [key]: e.target.value }));
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    updateUser({ ageGroup, preferredLanguage });
+    updateUser(form, {
+      onSuccess: () => toast({ title: "Settings saved successfully." }),
+      onError: () => toast({ title: "Failed to save settings.", variant: "destructive" }),
+    });
   };
 
-  if (isLoading) return <div className="p-8"><Loader2 className="animate-spin w-8 h-8 text-teal-600" /></div>;
+  if (isLoading) return (
+    <div className="flex items-center justify-center min-h-96">
+      <Loader2 className="animate-spin w-10 h-10 text-teal-600" />
+    </div>
+  );
 
   return (
     <div className="max-w-2xl mx-auto animate-in fade-in duration-500 space-y-8">
       <div>
-        <h1 className="text-4xl font-display font-bold">Profile Settings</h1>
-        <p className="text-muted-foreground mt-2 text-lg">Manage your personal information and preferences.</p>
+        <h1 className="text-4xl font-display font-bold text-slate-900 dark:text-white">Settings</h1>
+        <p className="text-muted-foreground mt-2 text-lg">Manage your profile, preferences, and emergency contacts.</p>
       </div>
 
-      <div className="glass-card rounded-3xl p-8">
-        <div className="flex items-center gap-6 mb-8 pb-8 border-b border-border">
-          <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-teal-400 to-blue-500 flex items-center justify-center text-white shadow-lg overflow-hidden">
-            {user?.profileImageUrl ? <img src={user.profileImageUrl} alt="Profile" className="w-full h-full object-cover" /> : <span className="text-3xl font-bold">{user?.firstName?.[0] || "U"}</span>}
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* ── Profile ── */}
+        <section className="glass-card rounded-3xl p-8 space-y-6">
+          <div className="flex items-center gap-5 pb-6 border-b border-border">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-teal-400 to-blue-500 flex items-center justify-center text-white shadow-lg text-2xl font-bold overflow-hidden flex-shrink-0">
+              {user?.profileImageUrl ? (
+                <img src={user.profileImageUrl} alt="Profile" className="w-full h-full object-cover" />
+              ) : (
+                form.firstName?.[0] || "U"
+              )}
+            </div>
+            <div>
+              <p className="font-bold text-lg text-slate-900 dark:text-white">{user?.email}</p>
+              <p className="text-muted-foreground text-sm">Your account identity</p>
+            </div>
           </div>
-          <div>
-            <h2 className="text-2xl font-bold">{user?.firstName} {user?.lastName}</h2>
-            <p className="text-muted-foreground">{user?.email}</p>
+
+          <h2 className="font-bold text-base text-slate-700 dark:text-slate-300">Personal Details</h2>
+          <div className="grid grid-cols-2 gap-4">
+            <Field label="First Name" icon={User}>
+              <input type="text" value={form.firstName} onChange={set("firstName")} placeholder="First name" className={inputCls} />
+            </Field>
+            <Field label="Last Name" icon={User}>
+              <input type="text" value={form.lastName} onChange={set("lastName")} placeholder="Last name" className={inputCls} />
+            </Field>
           </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <Field label="Age Group" icon={Clock}>
+              <select value={form.ageGroup} onChange={set("ageGroup")} className={selectCls}>
+                {AGE_GROUPS.map(a => <option key={a}>{a}</option>)}
+              </select>
+            </Field>
+            <Field label="Preferred Language" icon={Globe}>
+              <select value={form.preferredLanguage} onChange={set("preferredLanguage")} className={selectCls}>
+                {LANGUAGES.map(l => <option key={l}>{l}</option>)}
+              </select>
+            </Field>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <Field label="Occupation" icon={Briefcase}>
+              <select value={form.occupationType} onChange={set("occupationType")} className={selectCls}>
+                {OCCUPATIONS.map(o => <option key={o}>{o}</option>)}
+              </select>
+            </Field>
+            <Field label="Monthly Budget for Support" icon={DollarSign}>
+              <select value={form.budget} onChange={set("budget")} className={selectCls}>
+                {BUDGETS.map(b => <option key={b}>{b}</option>)}
+              </select>
+            </Field>
+          </div>
+        </section>
+
+        {/* ── Location ── */}
+        <section className="glass-card rounded-3xl p-8 space-y-6">
+          <h2 className="font-bold text-base text-slate-700 dark:text-slate-300 flex items-center gap-2">
+            <MapPin className="w-4 h-4 text-teal-600" /> Location (used to personalise Find Help)
+          </h2>
+          <div className="grid grid-cols-2 gap-4">
+            <Field label="City" icon={MapPin}>
+              <input type="text" value={form.city} onChange={set("city")} placeholder="e.g. Mumbai" className={inputCls} />
+            </Field>
+            <Field label="Locality / Area" icon={MapPin}>
+              <input type="text" value={form.locality} onChange={set("locality")} placeholder="e.g. Andheri West" className={inputCls} />
+            </Field>
+          </div>
+        </section>
+
+        {/* ── Emergency Contact ── */}
+        <section className="glass-card rounded-3xl p-8 space-y-6 border-l-4 border-rose-400">
+          <h2 className="font-bold text-base text-slate-700 dark:text-slate-300 flex items-center gap-2">
+            <ShieldAlert className="w-4 h-4 text-rose-500" /> Emergency Contact
+          </h2>
+          <p className="text-sm text-muted-foreground -mt-3">
+            This is stored privately and can be shown to you if you express distress during a conversation.
+          </p>
+          <Field label="Emergency Contact Number or Name" icon={Phone}>
+            <input type="text" value={form.emergencyContact} onChange={set("emergencyContact")} placeholder="e.g. +91 99999 00000 (Mum)" className={inputCls} />
+          </Field>
+        </section>
+
+        {/* ── Save ── */}
+        <div className="flex items-center gap-4">
+          <button
+            type="submit"
+            disabled={isPending}
+            className="px-8 py-3 rounded-xl bg-teal-600 text-white font-bold hover:bg-teal-700 transition-colors disabled:opacity-50 flex items-center gap-2 shadow-lg shadow-teal-600/20"
+          >
+            {isPending ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
+            Save Settings
+          </button>
         </div>
+      </form>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-2">
-            <label className="text-sm font-semibold text-slate-700 flex items-center gap-2"><Clock className="w-4 h-4 text-teal-600" /> Age Group</label>
-            <select value={ageGroup} onChange={(e) => setAgeGroup(e.target.value)} className="w-full px-4 py-3 rounded-xl border-2 border-border bg-card focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10 outline-none transition-all">
-              <option value="Teen">Teen (13-19)</option><option value="Young Adult">Young Adult (20-35)</option><option value="Middle Age">Middle Age (36-55)</option><option value="Senior">Senior (55+)</option>
-            </select>
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm font-semibold text-slate-700 flex items-center gap-2"><Globe className="w-4 h-4 text-teal-600" /> Preferred Language</label>
-            <select value={preferredLanguage} onChange={(e) => setPreferredLanguage(e.target.value)} className="w-full px-4 py-3 rounded-xl border-2 border-border bg-card focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10 outline-none transition-all">
-              <option value="English">English</option><option value="Hindi">Hindi</option><option value="Urdu">Urdu</option>
-            </select>
-          </div>
-          <div className="pt-4 flex items-center gap-4">
-            <button type="submit" disabled={isPending || (ageGroup === user?.ageGroup && preferredLanguage === user?.preferredLanguage)} className="px-8 py-3 rounded-xl bg-teal-600 text-white font-bold hover:bg-teal-700 transition-colors disabled:opacity-50 flex items-center gap-2">{isPending && <Loader2 className="w-5 h-5 animate-spin" />}Save Changes</button>
-            {isSuccess && <span className="text-green-600 flex items-center gap-1 font-medium"><Check className="w-5 h-5" /> Saved</span>}
-          </div>
-        </form>
-      </div>
-
-      <div className="text-center text-sm text-muted-foreground pb-4">
-        TalkEasy AI · Developed by <span className="font-semibold text-foreground">Taha Shahud</span> and <span className="font-semibold text-foreground">Praneet Gholap</span><br />
+      <div className="text-center text-xs text-muted-foreground pb-6">
+        TalkEasy · Developed by <span className="font-semibold text-foreground">Taha Shahud</span> and <span className="font-semibold text-foreground">Praneet Gholap</span><br />
         School of Engineering and Technology
       </div>
     </div>

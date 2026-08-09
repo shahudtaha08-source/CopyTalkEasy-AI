@@ -16,6 +16,9 @@ import MoodTracker from "@/pages/MoodTracker";
 import HabitTracker from "@/pages/HabitTracker";
 import Statistics from "@/pages/Statistics";
 import EmotionalHistory from "@/pages/EmotionalHistory";
+import FindHelp from "@/pages/FindHelp";
+import Journal from "@/pages/Journal";
+import Resources from "@/pages/Resources";
 import Settings from "@/pages/Settings";
 
 function Router() {
@@ -36,6 +39,12 @@ function Router() {
       <Route path="/chat">
         <ProtectedRoute>
           <Layout><Chatbot /></Layout>
+        </ProtectedRoute>
+      </Route>
+
+      <Route path="/journal">
+        <ProtectedRoute>
+          <Layout><Journal /></Layout>
         </ProtectedRoute>
       </Route>
 
@@ -60,6 +69,18 @@ function Router() {
       <Route path="/history">
         <ProtectedRoute>
           <Layout><EmotionalHistory /></Layout>
+        </ProtectedRoute>
+      </Route>
+
+      <Route path="/help">
+        <ProtectedRoute>
+          <Layout><FindHelp /></Layout>
+        </ProtectedRoute>
+      </Route>
+
+      <Route path="/resources">
+        <ProtectedRoute>
+          <Layout><Resources /></Layout>
         </ProtectedRoute>
       </Route>
 

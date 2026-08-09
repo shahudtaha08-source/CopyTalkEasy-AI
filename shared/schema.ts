@@ -17,6 +17,11 @@ export const users = pgTable("users", {
   profileImageUrl: varchar("profile_image_url"),
   ageGroup: text("age_group"), 
   preferredLanguage: text("preferred_language").default('English'), 
+  emergencyContact: text("emergency_contact"),
+  city: text("city"),
+  locality: text("locality"),
+  budget: text("budget"),
+  occupationType: text("occupation_type"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -60,10 +65,22 @@ export const habits = pgTable("habits", {
   createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
 });
 
+export const journals = pgTable("journals", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  title: text("title"),
+  content: text("content").notNull(),
+  type: text("type").notNull().default("reflection"), // daily, gratitude, reflection, free
+  tags: text("tags"),
+  date: date("date").notNull().default(sql`CURRENT_DATE`),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+});
+
 export const insertConversationSchema = createInsertSchema(conversations).omit({ id: true, createdAt: true, userId: true });
 export const insertMessageSchema = createInsertSchema(messages).omit({ id: true, createdAt: true });
 export const insertMoodSchema = createInsertSchema(moods).omit({ id: true, createdAt: true, userId: true });
 export const insertHabitSchema = createInsertSchema(habits).omit({ id: true, createdAt: true, userId: true });
+export const insertJournalSchema = createInsertSchema(journals).omit({ id: true, createdAt: true, userId: true });
 
 export type Conversation = typeof conversations.$inferSelect;
 export type InsertConversation = z.infer<typeof insertConversationSchema>;
@@ -73,3 +90,5 @@ export type Mood = typeof moods.$inferSelect;
 export type InsertMood = z.infer<typeof insertMoodSchema>;
 export type Habit = typeof habits.$inferSelect;
 export type InsertHabit = z.infer<typeof insertHabitSchema>;
+export type Journal = typeof journals.$inferSelect;
+export type InsertJournal = z.infer<typeof insertJournalSchema>;

@@ -1,7 +1,7 @@
 import { db } from "./db";
 import { 
-  users, moods, habits, conversations, messages,
-  type User, type InsertMood, type Mood, type InsertHabit, type Habit
+  users, moods, habits, conversations, messages, journals,
+  type User, type InsertMood, type Mood, type InsertHabit, type Habit, type Journal, type InsertJournal
 } from "@shared/schema";
 import { eq, desc, and } from "drizzle-orm";
 
@@ -14,6 +14,10 @@ export interface IStorage {
   getHabits(userId: string, date?: string): Promise<Habit[]>;
   createHabit(userId: string, habit: InsertHabit): Promise<Habit>;
   updateHabit(id: number, updates: Partial<InsertHabit>): Promise<Habit>;
+
+  // Journals
+  getJournals(userId: string): Promise<Journal[]>;
+  createJournal(userId: string, journal: InsertJournal): Promise<Journal>;
 
   // User
   updateUser(id: string, updates: Partial<User>): Promise<User>;
@@ -46,6 +50,15 @@ export class DatabaseStorage implements IStorage {
   async updateHabit(id: number, updates: Partial<InsertHabit>): Promise<Habit> {
     const [habit] = await db.update(habits).set(updates).where(eq(habits.id, id)).returning();
     return habit;
+  }
+
+  async getJournals(userId: string): Promise<Journal[]> {
+    return await db.select().from(journals).where(eq(journals.userId, userId)).orderBy(desc(journals.date));
+  }
+
+  async createJournal(userId: string, insertJournal: InsertJournal): Promise<Journal> {
+    const [journal] = await db.insert(journals).values({ ...insertJournal, userId }).returning();
+    return journal;
   }
 
   async updateUser(id: string, updates: Partial<User>): Promise<User> {

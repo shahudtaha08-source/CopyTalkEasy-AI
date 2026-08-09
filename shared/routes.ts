@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { insertMoodSchema, insertHabitSchema, users, moods, habits, conversations, messages } from './schema';
+import { insertMoodSchema, insertHabitSchema, insertJournalSchema, users, moods, habits, conversations, messages, journals } from './schema';
 
 export const errorSchemas = {
   validation: z.object({ message: z.string(), field: z.string().optional() }),
@@ -20,7 +20,17 @@ export const api = {
     update: {
       method: 'PATCH' as const,
       path: '/api/user',
-      input: z.object({ ageGroup: z.string().optional(), preferredLanguage: z.string().optional() }),
+      input: z.object({
+        firstName: z.string().optional(),
+        lastName: z.string().optional(),
+        ageGroup: z.string().optional(),
+        preferredLanguage: z.string().optional(),
+        emergencyContact: z.string().optional(),
+        city: z.string().optional(),
+        locality: z.string().optional(),
+        budget: z.string().optional(),
+        occupationType: z.string().optional(),
+      }),
       responses: {
         200: z.custom<typeof users.$inferSelect>(),
         401: errorSchemas.unauthorized,
@@ -58,6 +68,19 @@ export const api = {
       path: '/api/habits/:id',
       input: z.object({ completed: z.boolean().optional(), notes: z.string().optional() }),
       responses: { 200: z.custom<typeof habits.$inferSelect>() }
+    }
+  },
+  journals: {
+    list: {
+      method: 'GET' as const,
+      path: '/api/journals',
+      responses: { 200: z.array(z.custom<typeof journals.$inferSelect>()) }
+    },
+    create: {
+      method: 'POST' as const,
+      path: '/api/journals',
+      input: z.object({ title: z.string().optional(), content: z.string(), type: z.string().optional(), tags: z.string().optional(), date: z.string().optional() }),
+      responses: { 201: z.custom<typeof journals.$inferSelect>() }
     }
   },
   chat: {
