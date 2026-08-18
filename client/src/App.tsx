@@ -4,6 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
+import { LanguageProvider } from "@/i18n/LanguageContext";
 
 // Components
 import { Layout } from "@/components/Layout";
@@ -12,6 +13,7 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 // Pages
 import Dashboard from "@/pages/Dashboard";
 import Chatbot from "@/pages/Chatbot";
+import AITherapist from "@/pages/AITherapist";
 import MoodTracker from "@/pages/MoodTracker";
 import HabitTracker from "@/pages/HabitTracker";
 import Statistics from "@/pages/Statistics";
@@ -39,6 +41,12 @@ function Router() {
       <Route path="/chat">
         <ProtectedRoute>
           <Layout><Chatbot /></Layout>
+        </ProtectedRoute>
+      </Route>
+
+      <Route path="/therapist">
+        <ProtectedRoute>
+          <Layout><AITherapist /></Layout>
         </ProtectedRoute>
       </Route>
 
@@ -98,10 +106,12 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Router />
-      </TooltipProvider>
+      <LanguageProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Router />
+        </TooltipProvider>
+      </LanguageProvider>
     </QueryClientProvider>
   );
 }

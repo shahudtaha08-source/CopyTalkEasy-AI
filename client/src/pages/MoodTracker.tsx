@@ -2,15 +2,17 @@ import { useState } from "react";
 import { useMoods, useCreateMood } from "@/hooks/use-moods";
 import { format } from "date-fns";
 import { Smile, Frown, Meh, Angry, Loader2, Check } from "lucide-react";
+import { useTranslation } from "@/i18n/LanguageContext";
 
 const MOODS = [
-  { value: "Happy", icon: Smile, color: "text-green-500", bg: "bg-green-100 border-green-200 hover:bg-green-200" },
-  { value: "Neutral", icon: Meh, color: "text-blue-500", bg: "bg-blue-100 border-blue-200 hover:bg-blue-200" },
-  { value: "Sad", icon: Frown, color: "text-indigo-500", bg: "bg-indigo-100 border-indigo-200 hover:bg-indigo-200" },
-  { value: "Stressed", icon: Angry, color: "text-rose-500", bg: "bg-rose-100 border-rose-200 hover:bg-rose-200" },
+  { value: "Happy", key: "happy", icon: Smile, color: "text-green-500", bg: "bg-green-100 border-green-200 hover:bg-green-200" },
+  { value: "Neutral", key: "neutral", icon: Meh, color: "text-blue-500", bg: "bg-blue-100 border-blue-200 hover:bg-blue-200" },
+  { value: "Sad", key: "sad", icon: Frown, color: "text-indigo-500", bg: "bg-indigo-100 border-indigo-200 hover:bg-indigo-200" },
+  { value: "Stressed", key: "stressed", icon: Angry, color: "text-rose-500", bg: "bg-rose-100 border-rose-200 hover:bg-rose-200" },
 ];
 
 export default function MoodTracker() {
+  const { t } = useTranslation();
   const { data: moods } = useMoods();
   const { mutate: logMood, isPending } = useCreateMood();
   
@@ -30,8 +32,8 @@ export default function MoodTracker() {
   return (
     <div className="max-w-4xl mx-auto animate-in fade-in duration-500 space-y-8">
       <div>
-        <h1 className="text-4xl font-display font-bold">Mood Tracker</h1>
-        <p className="text-muted-foreground mt-2 text-lg">Check in with yourself. How are you feeling today?</p>
+        <h1 className="text-4xl font-display font-bold">{t("moodTrackerTitle")}</h1>
+        <p className="text-muted-foreground mt-2 text-lg">{t("moodTrackerSubtitle")}</p>
       </div>
 
       {todayMood ? (
@@ -39,8 +41,8 @@ export default function MoodTracker() {
           <div className="w-20 h-20 bg-teal-100 dark:bg-teal-900 rounded-full flex items-center justify-center mx-auto mb-4">
             <Check className="w-10 h-10 text-teal-600 dark:text-teal-400" />
           </div>
-          <h2 className="text-2xl font-bold mb-2">You've logged your mood today!</h2>
-          <p className="text-xl mb-4 font-display">Feeling <strong className="capitalize text-teal-600">{todayMood.mood}</strong></p>
+          <h2 className="text-2xl font-bold mb-2">{t("loggedToday")}</h2>
+          <p className="text-xl mb-4 font-display">{t("feelingText")} <strong className="capitalize text-teal-600">{todayMood.mood}</strong></p>
           {todayMood.notes && (
             <div className="bg-white dark:bg-slate-900 p-4 rounded-xl inline-block max-w-lg shadow-sm border border-border">
               <p className="italic text-slate-600 dark:text-slate-300">"{todayMood.notes}"</p>
@@ -60,18 +62,19 @@ export default function MoodTracker() {
                 }`}
               >
                 <m.icon className={`w-12 h-12 mb-3 ${m.color}`} />
-                <span className="font-bold text-slate-800">{m.value}</span>
+                <span className="font-bold text-slate-800 dark:text-slate-100">{t(m.key as any)}</span>
               </button>
             ))}
           </div>
 
           <div className="space-y-4">
-            <label className="block text-lg font-semibold">Any thoughts? (Optional)</label>
+            <label className="block text-lg font-semibold">{t("anyThoughtsLabel")}</label>
             <textarea
+              placeholder={t("thoughtsPlaceholder")}
               value={notes}
-              onChange={e => setNotes(e.target.value)}
-              placeholder="What made you feel this way? Or just journal your day..."
-              className="w-full h-32 p-4 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10 outline-none resize-none"
+              onChange={(e) => setNotes(e.target.value)}
+              rows={3}
+              className="w-full p-3 border rounded-lg resize-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
@@ -81,14 +84,14 @@ export default function MoodTracker() {
             className="w-full mt-6 py-4 rounded-xl bg-teal-600 text-white font-bold text-lg hover:bg-teal-700 disabled:opacity-50 transition-all shadow-lg shadow-teal-600/30 flex justify-center items-center gap-2 hover:-translate-y-1"
           >
             {isPending && <Loader2 className="w-5 h-5 animate-spin" />}
-            Save Daily Mood
+            {t("saveMood")}
           </button>
         </form>
       )}
 
       {/* History Preview */}
       <div className="mt-12">
-        <h3 className="text-2xl font-display font-bold mb-6">Recent Moods</h3>
+        <h3 className="text-2xl font-display font-bold mb-6">{t("recentMoods")}</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {moods?.slice(0, 6).map((m: any) => {
             const moodConfig = MOODS.find(x => x.value === m.mood) || MOODS[0];

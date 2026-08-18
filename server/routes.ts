@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import OpenAI from "openai";
 import { storage } from "./storage";
-import { setupAuth, isAuthenticated, registerAuthRoutes } from "./replit_integrations/auth";
+import { setupLocalAuth, isAuthenticated } from "./auth";
 import { api } from "@shared/routes";
 import { db } from "./db";
 import { moods, conversations, messages, users, journals } from "@shared/schema";
@@ -16,8 +16,7 @@ function getOpenAI() {
 }
 
 export async function registerRoutes(httpServer: Server, app: Express): Promise<Server> {
-  await setupAuth(app);
-  registerAuthRoutes(app);
+  setupLocalAuth(app);
 
   app.patch(api.user.update.path, isAuthenticated, async (req: any, res) => {
     try {

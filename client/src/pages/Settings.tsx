@@ -1,13 +1,23 @@
 import { useState, useEffect } from "react";
 import { useUser, useUpdateUser } from "@/hooks/use-user";
 import {
-  Loader2, Globe, Clock, Check, User, Phone, MapPin, Briefcase,
-  DollarSign, ShieldAlert, Palette, Save
+  Loader2, Globe, Clock, User, Phone, MapPin, Briefcase,
+  DollarSign, ShieldAlert, Save
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "@/i18n/LanguageContext";
+import { LanguageCode } from "@/i18n/translations";
 
-const LANGUAGES = ["English", "Hindi", "Urdu", "Marathi", "Tamil", "Telugu", "Kannada", "Bengali", "Gujarati"];
-const AGE_GROUPS = ["Teen (13-19)", "Young Adult (20-35)", "Middle Age (36-55)", "Senior (55+)"];
+const LANGUAGES: LanguageCode[] = [
+  "English", "Hindi", "Urdu", "Marathi", "Tamil", 
+  "Telugu", "Malayalam", "Kannada", "Bengali", "Gujarati"
+];
+const AGE_GROUPS = [
+  "Teen (13-19)",
+  "Young Adult (20-35)",
+  "Adult (36-55)",
+  "Senior (55+)"
+];
 const OCCUPATIONS = ["Student", "Working Professional", "Self-Employed", "Homemaker", "Retired", "Unemployed", "Other"];
 const BUDGETS = ["Low (Free resources only)", "Medium (Under ₹500/session)", "High (₹500+ per session)"];
 
@@ -15,7 +25,7 @@ interface FormState {
   firstName: string;
   lastName: string;
   ageGroup: string;
-  preferredLanguage: string;
+  preferredLanguage: LanguageCode;
   emergencyContact: string;
   city: string;
   locality: string;
@@ -38,6 +48,7 @@ const inputCls = "w-full px-4 py-3 rounded-xl border-2 border-border bg-card foc
 const selectCls = `${inputCls} cursor-pointer`;
 
 export default function Settings() {
+  const { t, language, setLanguage } = useTranslation();
   const { data: user, isLoading } = useUser();
   const { mutate: updateUser, isPending } = useUpdateUser();
   const { toast } = useToast();
@@ -46,7 +57,7 @@ export default function Settings() {
     firstName: "",
     lastName: "",
     ageGroup: "Young Adult (20-35)",
-    preferredLanguage: "English",
+    preferredLanguage: language,
     emergencyContact: "",
     city: "",
     locality: "",
@@ -60,7 +71,7 @@ export default function Settings() {
         firstName: user.firstName || "",
         lastName: user.lastName || "",
         ageGroup: user.ageGroup || "Young Adult (20-35)",
-        preferredLanguage: user.preferredLanguage || "English",
+        preferredLanguage: (user.preferredLanguage as LanguageCode) || language,
         emergencyContact: user.emergencyContact || "",
         city: user.city || "",
         locality: user.locality || "",
@@ -70,8 +81,13 @@ export default function Settings() {
     }
   }, [user]);
 
-  const set = (key: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
-    setForm(f => ({ ...f, [key]: e.target.value }));
+  const set = (key: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const val = e.target.value;
+    setForm(f => ({ ...f, [key]: val }));
+    if (key === "preferredLanguage") {
+      setLanguage(val as LanguageCode);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -90,44 +106,44 @@ export default function Settings() {
   return (
     <div className="max-w-2xl mx-auto animate-in fade-in duration-500 space-y-8">
       <div>
-        <h1 className="text-4xl font-display font-bold text-slate-900 dark:text-white">Settings</h1>
-        <p className="text-muted-foreground mt-2 text-lg">Manage your profile, preferences, and emergency contacts.</p>
+        <h1 className="text-4xl font-display font-bold text-slate-900 dark:text-white">{t("settingsTitle")}</h1>
+        <p className="text-muted-foreground mt-2 text-lg">{t("settingsSubtitle")}</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* ── Profile ── */}
+        {/* Profile */}
         <section className="glass-card rounded-3xl p-8 space-y-6">
           <div className="flex items-center gap-5 pb-6 border-b border-border">
             <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-teal-400 to-blue-500 flex items-center justify-center text-white shadow-lg text-2xl font-bold overflow-hidden flex-shrink-0">
               {user?.profileImageUrl ? (
                 <img src={user.profileImageUrl} alt="Profile" className="w-full h-full object-cover" />
               ) : (
-                form.firstName?.[0] || "U"
+                form.firstName?.[0] || user?.username?.[0] || "U"
               )}
             </div>
             <div>
-              <p className="font-bold text-lg text-slate-900 dark:text-white">{user?.email}</p>
-              <p className="text-muted-foreground text-sm">Your account identity</p>
+              <p className="font-bold text-lg text-slate-900 dark:text-white">{user?.email || user?.username}</p>
+              <p className="text-muted-foreground text-sm">Your TalkEasy account identity</p>
             </div>
           </div>
 
-          <h2 className="font-bold text-base text-slate-700 dark:text-slate-300">Personal Details</h2>
+          <h2 className="font-bold text-base text-slate-700 dark:text-slate-300">{t("personalDetails")}</h2>
           <div className="grid grid-cols-2 gap-4">
-            <Field label="First Name" icon={User}>
+            <Field label={t("firstNameLabel")} icon={User}>
               <input type="text" value={form.firstName} onChange={set("firstName")} placeholder="First name" className={inputCls} />
             </Field>
-            <Field label="Last Name" icon={User}>
+            <Field label={t("lastNameLabel")} icon={User}>
               <input type="text" value={form.lastName} onChange={set("lastName")} placeholder="Last name" className={inputCls} />
             </Field>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <Field label="Age Group" icon={Clock}>
+            <Field label={t("ageGroupLabel")} icon={Clock}>
               <select value={form.ageGroup} onChange={set("ageGroup")} className={selectCls}>
                 {AGE_GROUPS.map(a => <option key={a}>{a}</option>)}
               </select>
             </Field>
-            <Field label="Preferred Language" icon={Globe}>
+            <Field label={t("preferredLanguageLabel")} icon={Globe}>
               <select value={form.preferredLanguage} onChange={set("preferredLanguage")} className={selectCls}>
                 {LANGUAGES.map(l => <option key={l}>{l}</option>)}
               </select>
@@ -140,7 +156,7 @@ export default function Settings() {
                 {OCCUPATIONS.map(o => <option key={o}>{o}</option>)}
               </select>
             </Field>
-            <Field label="Monthly Budget for Support" icon={DollarSign}>
+            <Field label="Monthly Support Budget" icon={DollarSign}>
               <select value={form.budget} onChange={set("budget")} className={selectCls}>
                 {BUDGETS.map(b => <option key={b}>{b}</option>)}
               </select>
@@ -148,13 +164,13 @@ export default function Settings() {
           </div>
         </section>
 
-        {/* ── Location ── */}
+        {/* Location */}
         <section className="glass-card rounded-3xl p-8 space-y-6">
           <h2 className="font-bold text-base text-slate-700 dark:text-slate-300 flex items-center gap-2">
-            <MapPin className="w-4 h-4 text-teal-600" /> Location (used to personalise Find Help)
+            <MapPin className="w-4 h-4 text-teal-600" /> Location (used for Find Help)
           </h2>
           <div className="grid grid-cols-2 gap-4">
-            <Field label="City" icon={MapPin}>
+            <Field label={t("cityLabel")} icon={MapPin}>
               <input type="text" value={form.city} onChange={set("city")} placeholder="e.g. Mumbai" className={inputCls} />
             </Field>
             <Field label="Locality / Area" icon={MapPin}>
@@ -163,20 +179,20 @@ export default function Settings() {
           </div>
         </section>
 
-        {/* ── Emergency Contact ── */}
+        {/* Emergency Contact */}
         <section className="glass-card rounded-3xl p-8 space-y-6 border-l-4 border-rose-400">
           <h2 className="font-bold text-base text-slate-700 dark:text-slate-300 flex items-center gap-2">
-            <ShieldAlert className="w-4 h-4 text-rose-500" /> Emergency Contact
+            <ShieldAlert className="w-4 h-4 text-rose-500" /> {t("emergencyContactLabel")}
           </h2>
           <p className="text-sm text-muted-foreground -mt-3">
-            This is stored privately and can be shown to you if you express distress during a conversation.
+            Stored privately to present in times of emotional distress.
           </p>
-          <Field label="Emergency Contact Number or Name" icon={Phone}>
-            <input type="text" value={form.emergencyContact} onChange={set("emergencyContact")} placeholder="e.g. +91 99999 00000 (Mum)" className={inputCls} />
+          <Field label={t("emergencyContactLabel")} icon={Phone}>
+            <input type="text" value={form.emergencyContact} onChange={set("emergencyContact")} placeholder="e.g. +91 99999 00000" className={inputCls} />
           </Field>
         </section>
 
-        {/* ── Save ── */}
+        {/* Save */}
         <div className="flex items-center gap-4">
           <button
             type="submit"
@@ -184,7 +200,7 @@ export default function Settings() {
             className="px-8 py-3 rounded-xl bg-teal-600 text-white font-bold hover:bg-teal-700 transition-colors disabled:opacity-50 flex items-center gap-2 shadow-lg shadow-teal-600/20"
           >
             {isPending ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
-            Save Settings
+            {t("saveSettings")}
           </button>
         </div>
       </form>

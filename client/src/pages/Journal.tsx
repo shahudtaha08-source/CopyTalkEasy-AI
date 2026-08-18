@@ -4,6 +4,7 @@ import { BookOpen, Plus, Tag, Search, Calendar as CalendarIcon, Pencil, Trash2, 
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
+import { useTranslation } from "@/i18n/LanguageContext";
 
 const TYPES = ["All", "reflection", "gratitude", "daily", "free"];
 const TYPE_COLORS: Record<string, string> = {
@@ -16,6 +17,7 @@ const TYPE_COLORS: Record<string, string> = {
 const EMPTY_FORM = { title: "", content: "", tags: "", type: "reflection" };
 
 export default function Journal() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const { data: journals = [], isLoading } = useJournals();
   const createMutation  = useCreateJournal();
@@ -108,81 +110,73 @@ export default function Journal() {
       <header className="flex justify-between items-end">
         <div>
           <h1 className="text-4xl font-display font-bold text-slate-900 dark:text-white flex items-center gap-3">
-            <BookOpen className="w-8 h-8 text-teal-600" /> Journal
+            <BookOpen className="w-8 h-8 text-teal-600" /> {t("journalTitle")}
           </h1>
-          <p className="text-muted-foreground mt-1 text-base">A private space to reflect, express gratitude, and write freely.</p>
+          <p className="text-muted-foreground mt-1 text-base">{t("journalSubtitle")}</p>
         </div>
-        <button
-          onClick={openCreate}
-          className="bg-teal-600 text-white px-5 py-2.5 rounded-full font-bold hover:bg-teal-700 transition flex items-center gap-2 shadow-lg shadow-teal-600/20 text-sm"
-        >
-          <Plus className="w-4 h-4" /> New Entry
-        </button>
-      </header>
-
-      {/* Entry Form */}
-      {showForm && (
-        <div className="glass-card rounded-2xl p-6 border border-teal-200 dark:border-teal-900 bg-teal-50/30 dark:bg-teal-950/10">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="font-bold text-lg">{editId ? "Edit Entry" : "New Journal Entry"}</h2>
-            <button onClick={closeForm} className="text-slate-400 hover:text-slate-600 transition"><X className="w-5 h-5" /></button>
-          </div>
-
-          <input
-            type="text"
-            placeholder="Title (optional)"
-            className="w-full bg-transparent text-xl font-bold border-none outline-none mb-4 text-slate-900 dark:text-white placeholder:text-slate-400"
-            value={form.title}
-            onChange={set("title")}
-          />
-
-          <div className="relative mb-4">
-            <textarea
-              placeholder="Write your thoughts here…"
-              className="w-full min-h-[160px] bg-white/60 dark:bg-slate-900/60 rounded-xl p-4 border border-slate-200 dark:border-slate-700 outline-none focus:ring-2 focus:ring-teal-500 resize-none text-slate-800 dark:text-slate-200 text-sm"
-              value={form.content}
-              onChange={set("content")}
-              maxLength={charLimit}
-            />
-            <span className={`absolute bottom-3 right-3 text-xs ${form.content.length > charLimit * 0.9 ? "text-orange-500" : "text-slate-400"}`}>
-              {form.content.length} / {charLimit}
-            </span>
-          </div>
-
-          <div className="flex flex-wrap gap-3 items-center">
-            <select
-              value={form.type}
-              onChange={set("type")}
-              className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm font-medium outline-none focus:ring-2 focus:ring-teal-500"
-            >
-              <option value="reflection">🪞 Reflection</option>
-              <option value="gratitude">🙏 Gratitude</option>
-              <option value="daily">📅 Daily Journal</option>
-              <option value="free">✍️ Free Writing</option>
-            </select>
-
-            <div className="flex items-center gap-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 flex-1 min-w-[180px]">
-              <Tag className="w-4 h-4 text-slate-400 flex-shrink-0" />
-              <input
-                type="text"
-                placeholder="Tags, comma separated"
-                className="bg-transparent outline-none text-sm flex-1 min-w-0"
-                value={form.tags}
-                onChange={set("tags")}
-              />
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button className="w-full sm:w-auto bg-teal-600 hover:bg-teal-700 text-white font-bold py-6 px-8 rounded-2xl text-lg shadow-lg shadow-teal-600/30 hover:-translate-y-1 transition-all">
+              <Plus className="w-5 h-5 mr-2" /> {t("writeEntry")}
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>{editId ? t("editEntry") : t("writeEntry")}</DialogTitle>
+              <DialogDescription>
+                {editId ? t("updateEntryDesc") : t("createEntryDesc")}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">{t("journalTitleLabel")}</label>
+                <Input
+                  placeholder={t("entryTitlePlaceholder")}
+                  value={form.title}
+                  onChange={e => setForm({...form, title: e.target.value})}
+                  className="w-full"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">{t("journalContentLabel")}</label>
+                <Textarea
+                  placeholder={t("writeThoughtsPlaceholder")}
+                  value={form.content}
+                  onChange={e => setForm({...form, content: e.target.value})}
+                  rows={6}
+                  className="w-full"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">{t("journalTagsLabel")}</label>
+                <Input
+                  placeholder={t("tagsPlaceholder")}
+                  value={form.tags}
+                  onChange={e => setForm({...form, tags: e.target.value})}
+                  className="w-full"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Type</label>
+                <select
+                  value={form.type}
+                  onChange={e => setForm({...form, type: e.target.value})}
+                  className="w-full px-3 py-2 border rounded-lg"
+                >
+                  <option value="reflection">{t("journalTypeReflection")}</option>
+                  <option value="gratitude">{t("journalTypeGratitude")}</option>
+                  <option value="daily">{t("journalTypeDaily")}</option>
+                  <option value="free">{t("journalTypeFree")}</option>
+                </select>
+              </div>
             </div>
-
-            <button
-              onClick={handleSave}
-              disabled={isPending}
-              className="bg-teal-600 text-white px-5 py-2 rounded-lg font-medium hover:bg-teal-700 disabled:opacity-50 flex items-center gap-2 text-sm ml-auto"
-            >
-              {isPending ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Check className="w-4 h-4" />}
-              {editId ? "Update" : "Save"}
-            </button>
-          </div>
-        </div>
-      )}
+            <DialogFooter>
+              <Button onClick={closeForm}>{t("cancel")}</Button>
+              <Button onClick={handleSave} disabled={isPending}>{isPending ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Check className="w-4 h-4" />}{t("saveJournal")}</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </header>
 
       {/* Search & Filters */}
       <div className="flex flex-wrap gap-3 items-center">
@@ -190,7 +184,7 @@ export default function Journal() {
           <Search className="w-4 h-4 text-slate-400" />
           <input
             type="text"
-            placeholder="Search journals…"
+            placeholder={t("searchJournals")}
             className="bg-transparent outline-none flex-1 text-sm"
             value={search}
             onChange={e => setSearch(e.target.value)}
@@ -199,17 +193,17 @@ export default function Journal() {
         </div>
 
         <div className="flex gap-2 flex-wrap">
-          {TYPES.map(t => (
+          {TYPES.map(tVal => (
             <button
-              key={t}
-              onClick={() => setFilterType(t)}
+              key={tVal}
+              onClick={() => setFilterType(tVal)}
               className={`text-xs font-medium px-3 py-1.5 rounded-full capitalize transition ${
-                filterType === t
+                filterType === tVal
                   ? "bg-teal-600 text-white"
                   : "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50"
               }`}
             >
-              {t}
+              {tVal}
             </button>
           ))}
         </div>
@@ -220,8 +214,8 @@ export default function Journal() {
             onChange={e => setFilterTag(e.target.value)}
             className="text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-full px-3 py-1.5 outline-none"
           >
-            <option value="">All Tags</option>
-            {allTags.map(t => <option key={t} value={t}>#{t}</option>)}
+            <option value="">{t("allTags")}</option>
+            {allTags.map(tagVal => <option key={tagVal} value={tagVal}>#{tagVal}</option>)}
           </select>
         )}
       </div>
@@ -237,14 +231,14 @@ export default function Journal() {
           <div className="text-center py-16 glass-card rounded-2xl">
             <BookOpen className="w-12 h-12 text-slate-300 mx-auto mb-4" />
             <h3 className="text-lg font-bold text-slate-700 dark:text-slate-300 mb-2">
-              {journals.length === 0 ? "No entries yet" : "No entries match your filters"}
+              {journals.length === 0 ? t("noEntriesYet") : t("noEntriesMatchFilters")}
             </h3>
             <p className="text-muted-foreground text-sm mb-4">
-              {journals.length === 0 ? "Start writing your first journal entry." : "Try adjusting the search or filters."}
+              {journals.length === 0 ? t("startWritingFirstEntry") : t("tryAdjustingFilters")}
             </p>
             {journals.length === 0 && (
               <button onClick={openCreate} className="bg-teal-600 text-white px-5 py-2 rounded-full font-medium text-sm hover:bg-teal-700">
-                Write Entry
+                {t("writeEntry")}
               </button>
             )}
           </div>

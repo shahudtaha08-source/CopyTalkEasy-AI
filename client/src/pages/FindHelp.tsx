@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { PhoneCall, MapPin, Building2, Globe, HeartPulse, Hospital, Filter, X, Wifi, WifiOff } from "lucide-react";
+import { useTranslation } from "@/i18n/LanguageContext";
 
-// ── Resource data (modular — replace with API calls in future) ──────────────
 const EMERGENCY_RESOURCES = [
   { title: "National Emergency",     number: "112",           desc: "Police, Fire, Ambulance — 24/7" },
   { title: "Tele MANAS",             number: "14416",         desc: "National Mental Health Helpline — 24/7" },
@@ -54,6 +54,7 @@ function FilterSelect({ label, value, options, onChange }: { label: string; valu
 }
 
 export default function FindHelp() {
+  const { t } = useTranslation();
   const [country,  setCountry]  = useState("IN - India");
   const [state,    setState]    = useState("Maharashtra");
   const [city,     setCity]     = useState("Mumbai");
@@ -83,17 +84,17 @@ export default function FindHelp() {
       {/* Header */}
       <header>
         <h1 className="text-4xl font-display font-bold text-slate-900 dark:text-white flex items-center gap-3">
-          <HeartPulse className="w-8 h-8 text-rose-500" /> Find Help
+          <HeartPulse className="w-8 h-8 text-rose-500" /> {t("findHelpTitle")}
         </h1>
-        <p className="text-muted-foreground mt-2 text-base">
-          Discover emergency resources, counseling services, and professional support near you.
+        <p className="text-muted-foreground mt-2 text-lg">
+          {t("findHelpSubtitle")}
         </p>
       </header>
 
       {/* Emergency Resources */}
       <div className="bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/50 rounded-2xl p-6">
         <h2 className="text-xl font-bold text-rose-700 dark:text-rose-400 mb-4 flex items-center gap-2">
-          <PhoneCall className="w-5 h-5" /> Immediate Crisis Help — India
+          <PhoneCall className="w-5 h-5" /> {t("emergencyHelplines")}
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {EMERGENCY_RESOURCES.map((res, i) => (
@@ -235,7 +236,7 @@ export default function FindHelp() {
       </div>
 
       <div className="text-xs text-center text-muted-foreground pb-4">
-        TalkEasy does not endorse any specific provider. Always verify credentials before booking a session.
+        {t("disclaimerText")}
       </div>
     </div>
   );

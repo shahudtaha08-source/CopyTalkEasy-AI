@@ -1,9 +1,11 @@
 import { useMoods } from "@/hooks/use-moods";
 import { useHabits } from "@/hooks/use-habits";
+import { useTranslation } from "@/i18n/LanguageContext";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend, Cell } from 'recharts';
 import { format, subDays, parseISO } from "date-fns";
 
 export default function Statistics() {
+  const { t } = useTranslation();
   const { data: moods } = useMoods();
   // Fetching all habits to compute stats - passing no date fetches all.
   const { data: habits } = useHabits();
@@ -42,29 +44,29 @@ export default function Statistics() {
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       <div>
-        <h1 className="text-4xl font-display font-bold">Statistics & Insights</h1>
-        <p className="text-muted-foreground mt-2 text-lg">Visualize your mental wellness journey over time.</p>
+        <h1 className="text-4xl font-display font-bold">{t("statisticsTitle")}</h1>
+        <p className="text-muted-foreground mt-2 text-lg">{t("statisticsSubtitle")}</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Mood Trend Chart */}
         <div className="glass-card p-6 rounded-3xl">
-          <h3 className="text-xl font-bold mb-6">Mood Trend (Last 7 Days)</h3>
+          <h2 className="text-2xl font-bold mb-6">{t("moodTrendChart")}</h2>
           <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={moodData} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
                 <XAxis dataKey="date" stroke="#64748b" tick={{fontSize: 12}} />
                 <YAxis domain={[1, 4]} ticks={[1, 2, 3, 4]} stroke="#64748b" tickFormatter={(val) => {
-                  if(val===4) return 'Happy';
-                  if(val===3) return 'Neutral';
-                  if(val===2) return 'Stressed';
-                  if(val===1) return 'Sad';
+                  if(val===4) return t('happy');
+                  if(val===3) return t('neutral');
+                  if(val===2) return t('stressed');
+                  if(val===1) return t('sad');
                   return '';
                 }} tick={{fontSize: 12}} width={70} />
                 <Tooltip 
                   contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
-                  formatter={(value: any, name: any, props: any) => [props.payload.moodName, "Mood"]}
+                  formatter={(value: any, name: any, props: any) => [props.payload.moodName, t("moodLabel")]}
                 />
                 <Line 
                   type="monotone" 
@@ -82,7 +84,7 @@ export default function Statistics() {
 
         {/* Habit Completion Chart */}
         <div className="glass-card p-6 rounded-3xl">
-          <h3 className="text-xl font-bold mb-6">Habit Completion Rates</h3>
+          <h2 className="text-2xl font-bold mb-6">{t("habitCompletionChart")}</h2>
           <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={habitData} layout="vertical" margin={{ top: 5, right: 30, bottom: 5, left: 50 }}>
@@ -92,7 +94,7 @@ export default function Statistics() {
                 <Tooltip 
                   cursor={{fill: 'transparent'}}
                   contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
-                  formatter={(value: any) => [`${value}%`, "Completion Rate"]}
+                  formatter={(value: any) => [`${value}%`, t("completionRate")]}
                 />
                 <Bar dataKey="rate" radius={[0, 8, 8, 0]} barSize={24}>
                   {habitData.map((entry, index) => (

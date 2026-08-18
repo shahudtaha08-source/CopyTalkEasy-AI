@@ -5,13 +5,15 @@ import {
   useConversationHistory,
   useCreateConversation,
 } from "@/hooks/use-chat";
-import { Send, Plus, Loader2, Bot, User as UserIcon } from "lucide-react";
+import { Send, Plus, Bot, User as UserIcon } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { isDemoMode, addDemoMessage } from "@/lib/demo-data";
 import { queryClient } from "@/lib/queryClient";
 import { api } from "@shared/routes";
+import { useTranslation } from "@/i18n/LanguageContext";
 
 export default function Chatbot() {
+  const { t } = useTranslation();
   const { data: conversations, isLoading: loadingConvos } = useConversations();
   const { mutateAsync: createConvo } = useCreateConversation();
 
@@ -175,10 +177,10 @@ export default function Chatbot() {
         <div className="p-5 border-b border-border/50 bg-white/50 dark:bg-slate-900/50 backdrop-blur-md">
           <h2 className="text-lg font-bold flex items-center gap-2">
             <Bot className="w-5 h-5 text-teal-600" />
-            Support Chat
+            {t("chatTitle")}
           </h2>
           <p className="text-xs text-muted-foreground mt-0.5">
-            A reflective space to talk — not a therapist. If you are in crisis, please call <strong>14416</strong> (Tele MANAS).
+            {t("chatSubtitle")}
           </p>
         </div>
 
@@ -190,7 +192,7 @@ export default function Chatbot() {
                 <MessageCircle className="w-8 h-8 text-teal-600" />
               </div>
               <div>
-                <p className="text-lg font-bold text-slate-800 dark:text-slate-200">How are you feeling today?</p>
+                <p className="text-lg font-bold text-slate-800 dark:text-slate-200">{t("needSomeoneToTalk")}</p>
                 <p className="text-sm text-muted-foreground mt-1 max-w-xs">
                   Share what's on your mind. This is a safe, private, and non-judgmental space to reflect and organize your thoughts.
                 </p>
@@ -268,7 +270,7 @@ export default function Chatbot() {
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Type your message..."
+              placeholder={t("typeMessagePlaceholder")}
               disabled={isStreaming}
               className="w-full pl-6 pr-16 py-4 rounded-full bg-slate-50 dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10 outline-none transition-all disabled:opacity-50"
             />
