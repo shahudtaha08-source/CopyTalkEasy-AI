@@ -1163,6 +1163,11 @@ export const translations: Record<LanguageCode, Translations> = {
     moodLabel: "మూడ్",
     startSupportiveConversation: "మీ ఆలోచనలను విశ్లేషించడానికి, మీ ఆలోచనలను వ్యవస్థీకరించడానికి మరియు నిజ జీవిత శ్రేయస్సు మార్గదర్శకత్వాన్ని పొందడానికి మద్దతు ఇచ్చే సంభాషణను ప్రారంభించండి.",
     supportChatDescription: "ఒక థెరపిస్ట్ అని పేర్కొనకుండా ప్రతిబింబించే, మద్దతు ఇచ్చే సంభాషణలు.",
+    updateEntryDesc: "మీ జర్నల్ ఎంట్రీని నవీకరించండి",
+    createEntryDesc: "కొత్త జర్నల్ ఎంట్రీ సృష్టించండి",
+    entryTitlePlaceholder: "ఎంట్రీ శీర్షిక...",
+    tagsPlaceholder: "ట్యాగ్‌లు (కామాతో వేరు చేయబడినవి)...",
+    cancel: "రద్దు చేయండి",
   },
 
   Malayalam: {
@@ -1818,5 +1823,10 @@ export const translations: Record<LanguageCode, Translations> = {
     moodLabel: "Mood",
     startSupportiveConversation: "Start a supportive conversation to reflect, organize your thoughts and receive practical wellness guidance.",
     supportChatDescription: "Reflective, supportive conversations without claiming to be a therapist.",
+    updateEntryDesc: "Update your journal entry",
+    createEntryDesc: "Create a new journal entry",
+    entryTitlePlaceholder: "Entry title...",
+    tagsPlaceholder: "Tags (comma separated)...",
+    cancel: "Cancel",
   }
 };

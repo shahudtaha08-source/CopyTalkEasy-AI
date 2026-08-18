@@ -5,6 +5,10 @@ import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
 import { useTranslation } from "@/i18n/LanguageContext";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
 const TYPES = ["All", "reflection", "gratitude", "daily", "free"];
 const TYPE_COLORS: Record<string, string> = {

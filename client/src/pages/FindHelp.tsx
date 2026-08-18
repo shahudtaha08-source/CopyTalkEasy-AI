@@ -10,7 +10,7 @@ const EMERGENCY_RESOURCES = [
   { title: "iCall (TISS)",           number: "9152987821",    desc: "Psychosocial helpline — Mon–Sat 8am–10pm" },
 ];
 
-const PROVIDERS: Record<string, any[]> = {
+const PROVIDERS: Record<string, Record<string, Record<string, any[]>>> = {
   IN: {
     "Maharashtra": {
       "Mumbai": [

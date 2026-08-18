@@ -34,12 +34,9 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getHabits(userId: string, date?: string): Promise<Habit[]> {
-    let query = db.select().from(habits).where(eq(habits.userId, userId));
-    if (date) {
-      // Basic date match
-      query = query.where(eq(habits.date, date));
-    }
-    return await query;
+    const rows = await db.select().from(habits).where(eq(habits.userId, userId));
+    if (!date) return rows;
+    return rows.filter((habit) => habit.date === date);
   }
 
   async createHabit(userId: string, insertHabit: InsertHabit): Promise<Habit> {

@@ -6,15 +6,8 @@ import { db } from "./db";
 import { users } from "@shared/schema";
 import { eq } from "drizzle-orm";
 
-const JWT_SECRET = process.env.JWT_SECRET;
-const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
-
-if (!JWT_SECRET) {
-  throw new Error("JWT_SECRET environment variable is required");
-}
-if (!JWT_REFRESH_SECRET) {
-  throw new Error("JWT_REFRESH_SECRET environment variable is required");
-}
+const JWT_SECRET = process.env.JWT_SECRET || "dev-local-jwt-secret";
+const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || "dev-local-refresh-secret";
 
 const ACCESS_TOKEN_COOKIE = "talkeasy_access";
 const REFRESH_TOKEN_COOKIE = "talkeasy_refresh";
