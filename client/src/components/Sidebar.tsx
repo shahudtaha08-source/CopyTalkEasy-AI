@@ -1,14 +1,14 @@
 import { Link, useLocation } from "wouter";
-import { 
-  Home, 
-  MessageCircle, 
-  Smile, 
-  CheckCircle, 
-  PieChart, 
-  History, 
-  Settings, 
+import {
+  Home,
+  MessageCircle,
+  Smile,
+  CheckCircle,
+  PieChart,
+  History,
+  Settings,
   LogOut,
-  Leaf
+  Leaf,
 } from "lucide-react";
 import { useUser } from "@/hooks/use-user";
 
@@ -18,7 +18,7 @@ export function Sidebar() {
 
   const navItems = [
     { href: "/dashboard", label: "Dashboard", icon: Home },
-    { href: "/chat", label: "Therapist Chat", icon: MessageCircle },
+    { href: "/chat", label: "Support Chat", icon: MessageCircle },
     { href: "/mood", label: "Mood Tracker", icon: Smile },
     { href: "/habits", label: "Habits", icon: CheckCircle },
     { href: "/statistics", label: "Statistics", icon: PieChart },
@@ -41,16 +41,20 @@ export function Sidebar() {
 
       <div className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
         {navItems.map((item) => {
-          const isActive = location === item.href || (location.startsWith(item.href) && item.href !== '/dashboard');
+          const isActive = location === item.href || (location.startsWith(item.href) && item.href !== "/dashboard");
           return (
-            <Link key={item.href} href={item.href} className={`
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`
               flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200
-              ${isActive 
-                ? 'bg-teal-50 dark:bg-teal-900/20 text-teal-700 dark:text-teal-400 font-semibold' 
-                : 'text-muted-foreground hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-foreground'
+              ${isActive
+                ? "bg-teal-50 dark:bg-teal-900/20 text-teal-700 dark:text-teal-400 font-semibold"
+                : "text-muted-foreground hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-foreground"
               }
-            `}>
-              <item.icon className={`w-5 h-5 ${isActive ? 'text-teal-600 dark:text-teal-400' : ''}`} />
+            `}
+            >
+              <item.icon className={`w-5 h-5 ${isActive ? "text-teal-600 dark:text-teal-400" : ""}`} />
               {item.label}
             </Link>
           );
@@ -63,14 +67,14 @@ export function Sidebar() {
             <img src={user.profileImageUrl} alt="Profile" className="w-8 h-8 rounded-full" />
           ) : (
             <div className="w-8 h-8 rounded-full bg-teal-100 dark:bg-teal-900 flex items-center justify-center text-teal-700 dark:text-teal-300 font-bold">
-              {user?.firstName?.[0] || user?.email?.[0] || 'U'}
+              {user?.firstName?.[0] || user?.email?.[0] || "U"}
             </div>
           )}
           <div className="flex-1 overflow-hidden">
-            <p className="text-sm font-medium text-foreground truncate">{user?.firstName || 'User'}</p>
+            <p className="text-sm font-medium text-foreground truncate">{user?.firstName || "User"}</p>
           </div>
         </div>
-        <button 
+        <button
           onClick={handleLogout}
           className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-muted-foreground hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:text-red-400 transition-colors"
         >
