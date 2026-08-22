@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Home, MessageCircle, Smile, CheckCircle, PieChart, History, Settings, LogOut } from "lucide-react";
+import { Home, MessageCircle, Smile, CheckCircle, PieChart, History, Settings, LogOut, Moon } from "lucide-react";
 import { useUser } from "@/hooks/use-user";
 
 export function Sidebar() {
@@ -10,6 +10,7 @@ export function Sidebar() {
     { href: "/chat", label: "Support Chat", icon: MessageCircle },
     { href: "/mood", label: "Mood Tracker", icon: Smile },
     { href: "/habits", label: "Habits", icon: CheckCircle },
+    { href: "/sleep", label: "Sleep Tracker", icon: Moon },
     { href: "/statistics", label: "Statistics", icon: PieChart },
     { href: "/history", label: "Emotional History", icon: History },
     { href: "/settings", label: "Settings", icon: Settings },
