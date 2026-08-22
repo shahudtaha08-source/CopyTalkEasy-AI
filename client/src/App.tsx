@@ -4,6 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
+import Landing from "@/pages/Landing";
 import { Layout } from "@/components/Layout";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Dashboard from "@/pages/Dashboard";
@@ -18,7 +19,7 @@ import Settings from "@/pages/Settings";
 function Router() {
   return (
     <Switch>
-      <Route path="/"><ProtectedRoute><Redirect to="/dashboard" /></ProtectedRoute></Route>
+      <Route path="/" component={Landing} />
       <Route path="/dashboard"><ProtectedRoute><Layout><Dashboard /></Layout></ProtectedRoute></Route>
       <Route path="/chat"><ProtectedRoute><Layout><Chatbot /></Layout></ProtectedRoute></Route>
       <Route path="/mood"><ProtectedRoute><Layout><MoodTracker /></Layout></ProtectedRoute></Route>
