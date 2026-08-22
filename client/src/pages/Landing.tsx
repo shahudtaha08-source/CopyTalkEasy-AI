@@ -19,8 +19,8 @@ export default function Landing() {
         </div>
         <h1 className="text-5xl font-bold mb-4">CopyTalkEasy</h1>
         <p className="text-xl max-w-2xl mx-auto">
-          A wellbeing and personal growth platform by Taha Shahud, designed to make reflection,
-          habits, emotional awareness and supportive technology easier to access.
+          A personal wellbeing and growth platform designed to make reflection, habits,
+          emotional awareness and supportive technology easier to access.
         </p>
         <div className="mt-8 flex justify-center gap-4">
           <a href="/api/login" className="bg-white text-blue-700 px-6 py-3 rounded-xl font-semibold shadow">Go to Dashboard</a>
@@ -31,8 +31,8 @@ export default function Landing() {
       <section className="py-20 px-6 max-w-6xl mx-auto">
         <h2 className="text-3xl font-bold text-center mb-12">CopyTalkEasy Features</h2>
         <div className="grid md:grid-cols-3 gap-8">
-          <FeatureCard title="Support Chat" status>
-            A dedicated support-focused chat experience. AI-powered support is currently being developed for a future Ollama-based release.
+          <FeatureCard title="Support Chat">
+            A dedicated support-focused chat experience powered locally through Ollama.
           </FeatureCard>
           <FeatureCard title="Mood Tracking">
             Track your emotional state daily and understand how your mood evolves over time.
@@ -57,20 +57,16 @@ export default function Landing() {
         <div className="max-w-3xl mx-auto">
           <h3 className="text-xl font-semibold text-blue-700 mb-3">Taha Shahud</h3>
           <p className="text-gray-600 mb-4">
-            Taha Shahud is the founder and builder behind CopyTalkEasy. He creates practical technology projects with a focus on useful experiences, thoughtful design and solving real problems.
+            Student, developer, thinker, and a creative-minded builder with a strong interest in turning ideas into real, working projects.
           </p>
           <p className="text-gray-600 mb-8">
-            CopyTalkEasy is one part of that journey — a product built around personal reflection, wellbeing tools and supportive technology rather than a portfolio of every project.
+            Taha is especially creative-minded, with many ideas constantly taking shape — and those ideas are actively being explored and implemented step by step.
           </p>
-          <div className="flex justify-center gap-4">
-            <a href="https://taha-personal.netlify.app" target="_blank" rel="noreferrer" className="bg-blue-700 text-white px-5 py-2 rounded-lg">Portfolio</a>
-            <a href="https://github.com/shahudtaha08-source" target="_blank" rel="noreferrer" className="bg-gray-800 text-white px-5 py-2 rounded-lg">GitHub</a>
-          </div>
         </div>
       </section>
 
       <footer className="text-center py-6 bg-gray-100 text-gray-500">
-        © {new Date().getFullYear()} CopyTalkEasy · Created by Taha Shahud
+        © {new Date().getFullYear()} CopyTalkEasy · Designed and Developed by Taha Shahud
       </footer>
     </div>
   );
