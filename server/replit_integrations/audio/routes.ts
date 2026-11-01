@@ -5,6 +5,16 @@ import { openai, speechToText, ensureCompatibleFormat } from "./client";
 // Body parser with 50MB limit for audio payloads
 const audioBodyParser = express.json({ limit: "50mb" });
 
+/**
+ * Parse and validate a route parameter that Express 5 types as string | string[].
+ * Returns a valid integer, or null if invalid.
+ */
+function parseRouteId(param: string | string[]): number | null {
+  const raw = Array.isArray(param) ? param[0] : param;
+  const id = parseInt(raw, 10);
+  return Number.isFinite(id) && id > 0 ? id : null;
+}
+
 export function registerAudioRoutes(app: Express): void {
   // Get all conversations
   app.get("/api/conversations", async (req: Request, res: Response) => {
@@ -20,7 +30,10 @@ export function registerAudioRoutes(app: Express): void {
   // Get single conversation with messages
   app.get("/api/conversations/:id", async (req: Request, res: Response) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = parseRouteId(req.params.id);
+      if (id === null) {
+        return res.status(400).json({ error: "Invalid conversation ID" });
+      }
       const conversation = await chatStorage.getConversation(id);
       if (!conversation) {
         return res.status(404).json({ error: "Conversation not found" });
@@ -36,8 +49,11 @@ export function registerAudioRoutes(app: Express): void {
   // Create new conversation
   app.post("/api/conversations", async (req: Request, res: Response) => {
     try {
-      const { title } = req.body;
-      const conversation = await chatStorage.createConversation(title || "New Chat");
+      const { title, userId } = req.body;
+      if (!userId || typeof userId !== "string") {
+        return res.status(400).json({ error: "userId is required" });
+      }
+      const conversation = await chatStorage.createConversation(title || "New Chat", userId);
       res.status(201).json(conversation);
     } catch (error) {
       console.error("Error creating conversation:", error);
@@ -48,7 +64,10 @@ export function registerAudioRoutes(app: Express): void {
   // Delete conversation
   app.delete("/api/conversations/:id", async (req: Request, res: Response) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = parseRouteId(req.params.id);
+      if (id === null) {
+        return res.status(400).json({ error: "Invalid conversation ID" });
+      }
       await chatStorage.deleteConversation(id);
       res.status(204).send();
     } catch (error) {
@@ -62,7 +81,10 @@ export function registerAudioRoutes(app: Express): void {
   // Uses gpt-4o-mini-transcribe for STT, gpt-audio for voice response
   app.post("/api/conversations/:id/messages", audioBodyParser, async (req: Request, res: Response) => {
     try {
-      const conversationId = parseInt(req.params.id);
+      const conversationId = parseRouteId(req.params.id);
+      if (conversationId === null) {
+        return res.status(400).json({ error: "Invalid conversation ID" });
+      }
       const { audio, voice = "alloy" } = req.body;
 
       if (!audio) {

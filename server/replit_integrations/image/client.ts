@@ -10,6 +10,7 @@ export const openai = new OpenAI({
 /**
  * Generate an image and return as Buffer.
  * Uses gpt-image-1 model via Replit AI Integrations.
+ * Throws if no image data is returned from the API.
  */
 export async function generateImageBuffer(
   prompt: string,
@@ -20,13 +21,20 @@ export async function generateImageBuffer(
     prompt,
     size,
   });
-  const base64 = response.data[0]?.b64_json ?? "";
+
+  const imageItem = response.data?.[0];
+  const base64 = imageItem?.b64_json;
+  if (!base64) {
+    throw new Error("Image generation returned no image data");
+  }
+
   return Buffer.from(base64, "base64");
 }
 
 /**
  * Edit/combine multiple images into a composite.
  * Uses gpt-image-1 model via Replit AI Integrations.
+ * Throws if no image data is returned from the API.
  */
 export async function editImages(
   imageFiles: string[],
@@ -47,7 +55,12 @@ export async function editImages(
     prompt,
   });
 
-  const imageBase64 = response.data[0]?.b64_json ?? "";
+  const imageItem = response.data?.[0];
+  const imageBase64 = imageItem?.b64_json;
+  if (!imageBase64) {
+    throw new Error("Image editing returned no image data");
+  }
+
   const imageBytes = Buffer.from(imageBase64, "base64");
 
   if (outputPath) {
@@ -56,4 +69,3 @@ export async function editImages(
 
   return imageBytes;
 }
-

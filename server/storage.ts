@@ -13,7 +13,7 @@ export interface IStorage {
   // Habits
   getHabits(userId: string, date?: string): Promise<Habit[]>;
   createHabit(userId: string, habit: InsertHabit): Promise<Habit>;
-  updateHabit(id: number, updates: Partial<InsertHabit>): Promise<Habit>;
+  updateHabitForUser(id: number, userId: string, updates: Partial<InsertHabit>): Promise<Habit | undefined>;
 
   // User
   updateUser(id: string, updates: Partial<User>): Promise<User>;
@@ -29,22 +29,25 @@ export class DatabaseStorage implements IStorage {
     return mood;
   }
 
-  async getHabits(userId: string, date?: string): Promise<Habit[]> {
-    let query = db.select().from(habits).where(eq(habits.userId, userId));
-    if (date) {
-      // Basic date match
-      query = query.where(eq(habits.date, date));
-    }
-    return await query;
-  }
+ async getHabits(userId: string, date?: string): Promise<Habit[]> {
+  const conditions = date
+    ? and(eq(habits.userId, userId), eq(habits.date, date))
+    : eq(habits.userId, userId);
+
+  return await db.select().from(habits).where(conditions);
+}
 
   async createHabit(userId: string, insertHabit: InsertHabit): Promise<Habit> {
     const [habit] = await db.insert(habits).values({ ...insertHabit, userId }).returning();
     return habit;
   }
 
-  async updateHabit(id: number, updates: Partial<InsertHabit>): Promise<Habit> {
-    const [habit] = await db.update(habits).set(updates).where(eq(habits.id, id)).returning();
+  async updateHabitForUser(id: number, userId: string, updates: Partial<InsertHabit>): Promise<Habit | undefined> {
+    const [habit] = await db
+      .update(habits)
+      .set(updates)
+      .where(and(eq(habits.id, id), eq(habits.userId, userId)))
+      .returning();
     return habit;
   }
 
