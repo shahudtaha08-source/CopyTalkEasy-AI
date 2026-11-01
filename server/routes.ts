@@ -34,8 +34,18 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     catch { res.status(400).json({ message: "Failed to create habit" }); }
   });
   app.patch("/api/habits/:id", isAuthenticated, async (req: any, res) => {
-    try { const input = api.habits.update.input.parse(req.body); res.json(await storage.updateHabit(parseInt(req.params.id), input)); }
-    catch { res.status(400).json({ message: "Failed to update habit" }); }
+    try {
+      const rawId = Number(req.params.id);
+      if (!Number.isSafeInteger(rawId) || rawId <= 0) {
+        return res.status(400).json({ message: "Invalid habit ID" });
+      }
+      const input = api.habits.update.input.parse(req.body);
+      const habit = await storage.updateHabitForUser(rawId, req.user.claims.sub, input);
+      if (!habit) {
+        return res.status(404).json({ message: "Habit not found" });
+      }
+      res.json(habit);
+    } catch { res.status(400).json({ message: "Failed to update habit" }); }
   });
 
   app.get(api.chat.list.path, isAuthenticated, async (req: any, res) => res.json(await db.select().from(conversations).where(eq(conversations.userId, req.user.claims.sub)).orderBy(desc(conversations.createdAt))));
@@ -43,12 +53,39 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     try { const input = api.chat.create.input.parse(req.body); const [conversation] = await db.insert(conversations).values({ ...input, userId: req.user.claims.sub }).returning(); res.status(201).json(conversation); }
     catch { res.status(400).json({ message: "Invalid input" }); }
   });
-  app.get(api.chat.history.path, isAuthenticated, async (req: any, res) => res.json(await db.select().from(messages).where(eq(messages.conversationId, parseInt(req.params.id))).orderBy(messages.createdAt)));
+  app.get(api.chat.history.path, isAuthenticated, async (req: any, res) => {
+    try {
+      const conversationId = Number(req.params.id);
+      if (!Number.isSafeInteger(conversationId) || conversationId <= 0) {
+        return res.status(400).json({ message: "Invalid conversation ID" });
+      }
+      const userId = req.user.claims.sub;
+      // Verify the conversation exists and belongs to the authenticated user
+      const [conversation] = await db
+        .select()
+        .from(conversations)
+        .where(and(eq(conversations.id, conversationId), eq(conversations.userId, userId)));
+      if (!conversation) {
+        return res.status(404).json({ message: "Conversation not found" });
+      }
+      const result = await db
+        .select()
+        .from(messages)
+        .where(eq(messages.conversationId, conversationId))
+        .orderBy(messages.createdAt);
+      res.json(result);
+    } catch {
+      res.status(400).json({ message: "Failed to fetch messages" });
+    }
+  });
 
   app.post(api.chat.sendMessage.path, isAuthenticated, async (req: any, res) => {
     try {
       const input = api.chat.sendMessage.input.parse(req.body);
-      const conversationId = parseInt(req.params.id);
+      const conversationId = Number(req.params.id);
+      if (!Number.isSafeInteger(conversationId) || conversationId <= 0) {
+        return res.status(400).json({ message: "Invalid conversation ID" });
+      }
       const [conversation] = await db.select().from(conversations).where(and(eq(conversations.id, conversationId), eq(conversations.userId, req.user.claims.sub)));
       if (!conversation) return res.status(404).json({ message: "Conversation not found" });
 
@@ -83,7 +120,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     let userMessages: any[] = [];
     if (convoIds.length > 0) userMessages = await db.select().from(messages).where(and(inArray(messages.conversationId, convoIds), eq(messages.role, "assistant"))).orderBy(desc(messages.createdAt));
     const history = [
-      ...userMoods.map(m => ({ id: m.id, date: typeof m.date === "string" ? m.date : m.date.toISOString(), type: "mood", value: m.mood, notes: m.notes })),
+      ...userMoods.map(m => ({ id: m.id, date: m.date, type: "mood", value: m.mood, notes: m.notes })),
       ...userMessages.filter(m => m.detectedEmotion).map(m => ({ id: m.id, date: m.createdAt.toISOString(), type: "emotion", value: m.detectedEmotion, suggestion: m.aiSuggestion }))
     ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
     res.json(history);
